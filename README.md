@@ -9,3 +9,12 @@ desarrolladas en el curso de Sistemas Operativos - Univalle - Mayo-Octubre 2019
 
 * [2019_05_24](2019_05_24)
 * [2019_05_31](2019_05_31)
+* [2019_06_14](2019_06_14)
+* [2019_06_21](2019_06_21)
+
+# Tareas y Talleres
+
+* [Ejercicios-programacion-C05](Ejercicios-programacion-C05)
+* [Proyecto-Shell](Proyecto-Shell)
+* [tarea_01_ostep](tarea_01_ostep)
+
