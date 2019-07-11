@@ -1,8 +1,0 @@
-cd ..
-dir
-cd myshell
-cd
-echo hola
-pause
-echo Adios
-quit
