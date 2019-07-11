@@ -12,7 +12,7 @@
 * [pregunta2.c](pregunta2.c)
 ### Write a program that opens a file (with the open() system call) and then calls fork() to create a new process. Can both the child and parent access the file descriptor returned by open()? What happens when they are writing to the file concurrently, i.e., at the same time?
 
-Tanto el hijo como el padre pueden acceder al descriptor de archivo abierto utilizando **open()**. Ambos pueden escribir en el archivo, pero el orden en el que lo hacen no es determinista (*si no usamos* **wait()**). ** Observacion: ** Es posible que solo uno haya podido escribir sobrescribiendo el otro.
+Tanto el hijo como el padre pueden acceder al descriptor de archivo abierto utilizando **open()**. Ambos pueden escribir en el archivo, pero el orden en el que lo hacen no es determinista (*si no usamos* **wait()**). **Observacion:** Es posible que solo uno haya podido escribir sobrescribiendo el otro.
 
 ## Pregunta 3
 * [pregunta3.c](pregunta3.c)
