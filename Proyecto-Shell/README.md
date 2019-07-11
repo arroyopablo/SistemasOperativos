@@ -11,10 +11,10 @@
 
 ###### Codigo fuente:
 
-* [funciones.h] (funciones.h)
-* [main.c] (main.c)
+* [funciones.h](funciones.h)
+* [main.c](main.c)
 
 ###### Archivos usados en prueba:
 
-* [file2] (file2)
-* [file] (file)
+* [file2](file2)
+* [file](file)
