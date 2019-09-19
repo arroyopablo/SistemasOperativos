@@ -1,6 +1,6 @@
 # Documentacion del paso a paso de la practica de DOCKER.
-## link de asciinema.
-*[]()
+## link de evidencia en youtube.
+*[HAProxy](https://www.youtube.com/watch?v=TWjXrWRhymM&feature=youtu.be)
 # 1
 	Se conecta a la maquina virtual previamente creada de DOCKER con Vagrant
 	con el comando ´´vagrant ssh´´
