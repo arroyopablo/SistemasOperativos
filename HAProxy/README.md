@@ -1,138 +1,75 @@
-# Documentacion del paso a paso de la practica de DOCKER.
+# Documentacion del paso a paso de la practica de HAProxy.
 ## link de evidencia en youtube.
-*[HAProxy](https://www.youtube.com/watch?v=TWjXrWRhymM&feature=youtu.be)
-# 1
-	Se conecta a la maquina virtual previamente creada de DOCKER con Vagrant
-	con el comando ´´vagrant ssh´´
+* [HAProxy](https://www.youtube.com/watch?v=TWjXrWRhymM&feature=youtu.be)
 
-# 2
+# Máquinas virtuales para HAProxy
 
-se descarga la imagen httpd
+En [Vagrantfile](Vagrantfile) se encuentra el archivo que describe la definición de las tres máquinas virtuales que se requieren para hacer el despliegue del cluster de máquinas indicados en este [enlace](https://www.howtoforge.com/tutorial/ubuntu-load-balancer-haproxy/).
 
-* docker pull httpd
+Modifique el `Vagrantfile` de modo que las máquinas virtuales se creen con el sistema operativo que indica el [enlace](https://www.howtoforge.com/tutorial/ubuntu-load-balancer-haproxy/).
 
-Para comprobar la instalación de estas imagenes escribir docker images
-para listar las imagenes.
+---
 
-# 3
-Para crear un alias en bash se necesito modificar el archivo .bashrc
+En este paso usted debió modificar el [Vagrantfile](Vagrantfile) de modo que se indica que el box que se va a usar es `ubuntu/xenial64`. 
+Ese es el box que indica el artículo que se sigue como guía para instalar HAProxy.
 
-Primero escribir el comando nano .bashrc para modificar el archivo
-Una vez abierto con nano ir a la parte donde dice Alias definitions y colocar lo siguiente abajo del texto informativo
+Modifique el `Vagrantfile` de modo que las máquinas virtuales tengan un [IP privado](https://whatismyipaddress.com/private-ip).
 
-* alias numimages='docker images | sed '1d' | wc -l'
+Se debe revisar primero como en un Vagrantfile se puede asignar un IP privado a una máquina virtual, [enlace](https://www.vagrantup.com/docs/networking/private_network.html#static-ip).
 
-Una vez escrita la linea de arriba en el archivo .bashrc, desconectarse de la maquina virtual y volver a conectarse
-ahora cuando se digite en la terminal numimages, arrojará el número de imagenes que han sido descargadas
+**El profesor debe indicar cuales son los IPs que asignará a cada una de las máquinas definidas en el Vagrantfile**.
 
-# 4
-Para llevar a cabo la siguiente actividad se necesita ejecutar el siguiente comando
+---
 
-* docker run -it ubuntu
+Modifique el `Vagrantfile` de modo que se lleve a cabo la instalación de los siguientes paquetes:
 
-Con este comando se ingresará al contenedor docker que ejecuta la imagen ubuntun en modo interactivo,
-para poder interactuar con el shell
+* `web01` y `web02` el servidor web de Apache.
+* `hap` el aplicativo haproxy.
 
-* Una vez dentro del contenedor para saber que archivos hay se ejecuta el comando ya conocido ls
-* Para saber en que usuario se está se mira el prompt (root) o se ejecuta el comando whoami
-* Al ejecutar el comando rm -rf /bin/* se eliminan todos los comandos que están ubicados en la carpeta bin, como por ejemplo ls o cat
-* Al salir o ejecutar otra terminal y disparar el contenedor con ubuntu, vuelve a tener los archivos la carpeta bin
-* Al ejecutar docker run -it ubuntu /bin/bash crea el contenedor, lo ejecuta y abre bash para ejecutar comandos
-* Para crear un usuario se utiliza el comando sudo useradd nombre, en caso de que no reconozca sudo obviarlo.
-* Instalar la aplicacion wget utilizando los comandos apt update luego apt install wget, comprobar ejecutano wget www.google.com
+---
 
+En este punto ya se tienen scripts para hacer la instalación del software en `web01`, `web02` y `hap`.
+De hecho, hacer el despliegue de `web01` e ir al navegador de tu computador e ir a la dirección IP que dió el profesor para ese equipo y con esa info ya podrás acceder al servidor web de la máquina virtual.
 
-# 5
-Para realizar esta actividad ejecutar los siguientes comandos y seguir los pasos
+Ahora lo que debes hacer es que las páginas web de `web01` y `web02` se encuentren en directorios llamados `web01` y `web02` respectivamente.
+Es decir, deseamos que se tengan páginas web personalizadas.
+La página `index.html` en el directorio `web01` deberá contener la siguiente información:
 
-* Salir del contenedor docker con exit (En el caso de que se esté en la terminal del contenedor)
-* nano .bashrc
-* Buscar en el archivo la parte donde dice Alias definitions
-* Agregar la siguiente linea abajo del texto de información
-* alias identificadores='docker ps -q'
-* Salir de la terminal de vagrant y volver a conectar por medio de ssh
-* Colocar a correr un contenedor con docker run -it ubuntu
-* Abrir otra terminal y escribir vagrant ssh
-* Escribir identificadores en la terminal
-* Mirar el resultado
+```
+<html>
+<body>
+<h1 alight=center> Hola Mundo </h1>
+</body>
+</html>
+```
 
+La página `index.html` en el directorio `web02` deberá contener la siguiente información:
 
-# 6
-Para borrar todos los contenedores que han terminado su ejecución hay que ejecutar el siguiente
-comando ya previamente pensado y creado (Las lineas que contengan exited son los contenedores que han terminado su ejecución)
+```
+<html>
+<body>
+<h1 alight=center> Hello World </h1>
+</body>
+</html>
+```
+---
 
-* docker rm $(docker ps -a -f status=exited -q)
+Ya en este momento usted deberá poder ver en su navegador las páginas personalizadas del servidor web `web01` y del servidor web `web02`.
+Ahora lo que se debe de habilitar es la configuración del servicio de HAProxy en la máquina `hap`.
+Para llevar a cabo esta **configuración** deberá seguir los pasos que están en la [guía de instalación sugerida](https://www.howtoforge.com/tutorial/ubuntu-load-balancer-haproxy/).
 
-# 7
-Para realizar esta actividad primero se debe crear un contenedor ejecutando docker run -it ubuntu
+**Nota** Hay un error en el archivo de configuración sugerido por la página web. 
+Existe una línea que dice:
 
-Una vez esté en ejecución abrir otro terminal, acceder a la maquina virtual mediante vagrant ssh
-Ya dentro de la maquina virtual ejecutar docker ps, copiar el identificador del contenedor que se está ejecutando
-y escribir docker stop id, donde id es el identificador previamente copiado.
+```
+listen webfarm 0.0.0.0:80
+```
 
-Se puede observar que la terminal donde estaba el shell del contenedor ha vuelto al shell de la maquina virtual.
+Esta se debe cambiar por estas dos:
 
-# 8
-Para realizar esta actividad con el id del contenedor que fue detenido mediante docker stop
-ejecutar docker start id, donde id es el identificador del contenedor que fue detenido.
+```
+listen webfarm 
+bind 0.0.0.0:80
+```
 
-# 9
-* Ejecutar el comando docker run -it ubuntu para lanzar un contenedor con ubuntu
-* Ejecutar apt update y luego apt install htop
-* Dentro del contenedor escribir exit para salir de el
-* Copiar el identificador del contenedor anterior, donde se digitó exit
-* Ejecutar docker start id, donde id es el identificador previamente copiado
-* Ejecutar docker attach id, donde id es el identificador previamente copiado
-* Ejecutar htop
-
-# 10
-Para realizar esta sección seguir los pasos
-
-* Descargar la imagen ejecutando docker pull prakhar1989/static-site
-* Comprobar la imagen descargada usando docker images
-* Ejecutar un contenedor con la imagen digitando docker run --rm -d -P --name static-site prakhar1989/static-site
-* Ejecutar docker port id, donde id es static-site
-* Ejecutar wget localhost:32769 (O el puerto que haya aparecido en el paso anterior)
-* Ejecutar cat index.html para ver el contenido del index.html que se está sirviendo en el contenedor
-* Ejecutar docker stop static-site para detener la ejecución del servidor
-
-# 11
-* Dentro de la maquina virtual ejecutar docker pull r-base (Puede tardar varios segundos)
-* Ejecutar docker run -ti --rm r-base
-* Comprobar que se puede seguir realizando tareas
-
-# 12
-Dentro de la maquina virtual seguir los pasos:
-
-* Ejecutar mkdir linux_tweet_app
-* Ingresar al directorio
-* Ejecutar nano Dockerfile
-
-Copiar en el archivo Dokerfile lo siguiente
-
-    FROM nginx:latest
-
-    COPY index.html /usr/share/nginx/html
-
-    EXPOSE 80 443
-
-    CMD ["nginx", "-g", "daemon off;"]
-
-* Ejecutar nano index.html
-
-copiar y pegar lo siguiente
-
-    <html>
-      <body>
-	    <h1> Saludos, Gustavo Aguirre, Sebastian Serna </h1>
-      </body>
-    </html>
-
-
-* Para probar el contenedor ejecutar docker build -t miweb, lo cual creará la imagen
-* Verificar la imagen ejecutando docker images
-* Ejecutar docker run -p 443:80 miweb
-* Abrir otra terminal y conectarse a la maquina virtual (vagrant ssh)
-* Ejecutar wget localhost:443
-* Ejecutar cat index.html
-* Verificar que efectivamente eas es la página web creada
+Una vez la configuración este lista, asegurarse que se puede hacer el acceso al servidor de HAProxy desde el número IP del *host*.
