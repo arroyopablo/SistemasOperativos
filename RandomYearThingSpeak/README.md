@@ -1,12 +1,7 @@
-# Sensor de temperatura (simulado) y ThingSpeak
+# generador de años aleatorios y ThingSpeak
 
-Este repositorio busca presentar un escenario donde una máquina virtual que corre [Raspbian](https://www.raspbian.org/) toma datos de un sensor de temperatura y los envía a la nube.
+Este repositorio busca presentar un escenario donde una máquina virtual que corre [Raspbian](https://www.raspbian.org/) toma datos de un generador de años y los envía a la nube.
 
-* [Quick start](#quick-start)
-* [Requerimientos](#requerimientos)
-  * [OpenWeatherMap](#openweathermap)
-  * [ThingSpeak](#thingspeak)
-  * [Descargar este repositorio](#descargar-este-repositorio)
 * [Desarrollo de la práctica](#desarrollo-de-la-práctica)
   * [Preparación de scripts](#preparación-de-scripts)
     * [Simulando el sensor de temperatura](#simulando-el-sensor-de-temperatura)
@@ -18,82 +13,42 @@ Este repositorio busca presentar un escenario donde una máquina virtual que cor
 
 ---
 
-# Quick start
-
-La forma rápida de llevar a cabo esta guía es:
-
-* Cumplir con todos los items de la sección [Requerimientos](#requerimientos).
-* [Desplegar el sistema operativo Raspbian](#despliegue-de-sistema-operativo-raspbian)
-* [Programar la ejecución de los scripts](#programando-la-ejecucion-del-script-de-forma-periódica)
-
----
-
-# Requerimientos
-
-Para llevar a cabo esta práctica es necesario tener cuenta en los siguientes sitios:
-
-* [OpenWeatherMap](https://openweathermap.org/)
-* [ThingSpeak](https://thingspeak.com/)
-
-De cada uno de estos sitios se deben obtener unas llaves que permitan el acceso a los *web services* de cada uno de ellos.
-
-## OpenWeatherMap
-
-Una vez entra al sitio web con su usuario registrado, visitar [este enlace](https://home.openweathermap.org/api_keys).
-
-## ThingSpeak
-
-Una vez entra al sitio web con su usuario registrado se hace necesario crear un *Channel*. 
-Una vez se crea el canal se debe visitar la pestaña asociada al canal llamada **API Keys**.
-Para efectos de esta práctica nos interesa la que dice **Write API Key**.
-
-## Descargar este repositorio
-
-Abra una terminal y ubicado en el directorio `${HOME}` del usuario ejecute el comando:
-
-```
-git clone https://github.com/josanabr/RPiThingSpeak.git
-```
-
----
-
 # Desarrollo de la práctica
 
 
 ## Preparación de scripts
 
-Como se mencionó al comienzo de este documento se quiere simular el acceso a un sensor de temperatura y los datos de este sensor subirlos a Internet.
+Como se mencionó al comienzo de este documento se quiere tener acceso a un generador de años aleatorios y los datos de este generador subirlos a Internet.
 
-### Simulando el sensor de temperatura
+### Generador de años aleatorios
 
-Los datos del sensor serán tomados de la plataforma [OpenWeatherMap](https://home.openweathermap.org/).
+Los datos del generador serán tomados de la plataforma [rapidapi](https://rapidapi.com/).
 Para tomar los datos de esta plataforma se debe crear un script que toma los datos de la plataforma.
-Este script se llamará `openWeather.sh` y tendrá el siguiente código:
+Este script se llamará `randomYear.sh` y tendrá el siguiente código:
 
 ```
 #!/usr/bin/env bash
-curl "https://api.openweathermap.org/data/2.5/weather?q=Cali,co&appid=<YOURKEY>&units=metric"
+curl --request GET \
+	--url 'https://numbersapi.p.rapidapi.com/6/21/date?fragment=true&json=true' \
+	--header 'x-rapidapi-host: numbersapi.p.rapidapi.com' \
+	--header 'x-rapidapi-key: cedf4035c9msh383b17601816b1cp19a99djsnede95eff7c8e'
 ```
-
-`YOURKEY` es un valor que usted puede obtener de [este enlace](https://home.openweathermap.org/api_keys).
 
 #### Un script que engloba lo anterior
 
-Para leer el sensor se ejecutará el siguiente comando,
+Para leer el generador se ejecutará el siguiente comando,
 
 ```
-./readSensor.sh dev00
+./readAPI.sh dev00
 ```
 
 Los datos quedarán en el archivo `dev00`.
 
 #### Leer los datos de dev00
 
-Para leer los datos de `dev00` se usa el script `readWeatherJSON.py` como sigue:
+Para leer los datos de `dev00` se usa el script `readYearJSON.py` como sigue:
 
-* **Temperatura** `./readWeatherJSON.py dev00 main temp`
-* **Humedad** `./readWeatherJSON.py dev00 main humidity`
-* **Viento** `./readWeatherJSON.py dev00 wind speed`
+* **year** `./readWeatherJSON.py dev00 main year`
 
 ### Subir los datos a ThingSpeak
 
@@ -152,51 +107,16 @@ Adicionar las siguiente líneas:
 
 ```
 
-*/2 * * * *     /home/pi/RPiThingSpeak/readSensor.sh dev00 >> /home/pi/RPiThingSpeak/logfile
-1-59/2 * * * *     /home/pi/RPiThingSpeak/subirDatosTS.sh >> /home/pi/RPiThingSpeak/logfile
+*/2 * * * *     /home/pi/RandomYearThingSpeak/readAPI.sh dev00 >> /home/pi/RandomYearThingSpeak/logfile
+1-59/2 * * * *     /home/pi/RandomYearThingSpeak/subirDatosTS.sh >> /home/pi/RandomYearThingSpeak/logfile
 
 ```
 
-Esto lo que indica es que cada dos minutos, 0, 2, 4, ..., 58; minutos se ejecuta el programa `readSensor.sh`.
+Esto lo que indica es que cada dos minutos, 0, 2, 4, ..., 58; minutos se ejecuta el programa `readAPI.sh`.
 De otro lado, `subirDatosTS.sh` se va a ejecutar también cada dos minutos pero al minuto, 1, 3, 5, ..., 59.
 
 **NOTA** Si su usuario no es `pi` por favor hacer los ajustes en la entrada al cron para indicar la ruta `home` adecuada de su usuario.
 
----
-
-# Detalles de bajo nivel
-
-El archivo `weather.txt` debe tener un contenido similar a este:
-
-```
-{"coord":{"lon":-76.51,"lat":3.43},"weather":[{"id":802,"main":"Clouds","description":"scattered clouds","icon":"03d"}],"base":"stations","main":{"temp":29,"pressure":1012,"humidity":51,"temp_min":29,"temp_max":29},"visibility":10000,"wind":{"speed":7.2,"deg":320},"clouds":{"all":40},"dt":1567635927,"sys":{"type":1,"id":8590,"message":0.006,"country":"CO","sunrise":1567594816,"sunset":1567638627},"timezone":-18000,"id":3687925,"name":"Cali","cod":200}
-```
-
-Para una mejor visualización de este contenido se puede ejecutar el siguiente comando:
-
-```
-python -m json.tool weather.txt
-```
-
-Para obtener un dato en particular ejecutar el siguiente comando:
-
-Humedad:
-
-```
-./readWeatherJSON.py main humidty
-```
-
-Temperatura:
-
-```
-./readWeatherJSON.py main temp
-```
-
-Velocidad del viento:
-
-```
-./readWeatherJSON.py wind speed
-```
 ---
 
 <sup>[osboxes](#osboxes)</sup> https://www.ostechnix.com/osboxes-free-unixlinux-virtual-machines-for-vmware-and-virtualbox/
