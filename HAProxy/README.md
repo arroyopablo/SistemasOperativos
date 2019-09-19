@@ -124,12 +124,11 @@ copiar y pegar lo siguiente
 
     <html>
       <body>
-	    <h1> Saludos, Gustavo Pinto, Miguel Cardona </h1>
+	    <h1> Saludos, Gustavo Aguirre, Sebastian Serna </h1>
       </body>
     </html>
 
 
-* Siguiente paso realizarlo Miguel Cardona, (Subir el contenido a hubdoker)
 * Para probar el contenedor ejecutar docker build -t miweb, lo cual creará la imagen
 * Verificar la imagen ejecutando docker images
 * Ejecutar docker run -p 443:80 miweb
